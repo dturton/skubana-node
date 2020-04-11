@@ -220,6 +220,7 @@ export interface CancelOrderRequest {
   cancelReason?: string;
   cancelReasonType: CancelReasonType;
   orderId?: number;
+  refundOrdersOnChannels?: boolean;
   orderNumber?: string;
   salesChannelId: number;
   updateSalesChannels: boolean;

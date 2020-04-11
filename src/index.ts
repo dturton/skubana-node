@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import queryString from 'query-string';
 import * as Types from './types';
 
 export default class SkubanaApi {
@@ -28,7 +29,8 @@ export default class SkubanaApi {
   }
 
   public async cancelOrder(canelRequest: Types.CancelOrderRequest): Promise<any> {
-    const response: AxiosResponse = await this.api.post(`/v1/orders/cancel`, canelRequest);
+    const stringified = queryString.stringify(canelRequest);
+    const response: AxiosResponse = await this.api.post(`/v1/orders/cancel?${stringified}`);
     const order: Types.Order = response.data;
     return order;
   }
