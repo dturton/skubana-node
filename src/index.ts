@@ -34,6 +34,20 @@ export default class SkubanaApi {
     const order: Types.Order = response.data;
     return order;
   }
+
+  public async getOrdersByWarehouse(warehouseId: number): Promise<Types.Order[]> {
+    const response: AxiosResponse = await this.api.get(
+      `/v1/orders?status=AWAITING_SHIPMENT&warehouseId=${warehouseId}`,
+    );
+    const orders = response.data;
+    return orders;
+  }
+
+  public async createShipment(shipmentPayload: Types.SkubanaExternalShipmentPayload) {
+    const response: AxiosResponse = await this.api.put(`/v1.1/shipment/external`, shipmentPayload);
+    const shipment = response.data;
+    return shipment;
+  }
 }
 
 export { Types };

@@ -210,8 +210,8 @@ export interface SalesChannel {
 }
 export interface ShipMethod {
   shippingProviderId: number;
-  shippingCarrier: string;
-  shippingServiceId: number;
+  shippingCarrier?: string;
+  shippingServiceId?: number;
   packageTypeId: number;
   ltlFtlShipment?: null;
 }
@@ -224,4 +224,15 @@ export interface CancelOrderRequest {
   orderNumber?: string;
   salesChannelId: number;
   updateSalesChannels: boolean;
+}
+
+export interface SkubanaExternalShipment {
+  trackingNumber: string;
+  orderId: number;
+  shipMethod: ShipMethod;
+}
+export interface SkubanaExternalShipmentPayload {
+  notifyCustomer: boolean;
+  updateChannel: boolean;
+  shipments: SkubanaExternalShipment;
 }
