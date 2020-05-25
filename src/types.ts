@@ -1,23 +1,17 @@
-export type ShippingSpeed =
-  | 'TWO_DAY'
-  | 'ECONOMY'
-  | 'NEXT_DAY'
-  | 'SFP'
-  | 'FREIGHT'
-  | 'SP_DELIVERY'
-  | 'IN_PARCEL'
-  | 'IN_FREIGHT';
-
 export type OrderStatus =
-  | 'CANCELLED'
-  | 'DELETED'
-  | 'CREATED'
-  | 'EXCEPTION'
+  | 'UNRESOLVED'
+  | 'AWAITING_PAYMENT'
+  | 'AWAITING_SHIPMENT'
+  | 'AWAITING_MC_FULFILLMENT'
+  | 'AWAITING_3PL_EXPORT'
+  | 'AWAITING_DROPSHIP'
+  | 'PENDING_FULFILLMENT'
   | 'SHIPPED'
-  | 'PICKING'
-  | 'PICKED'
-  | 'APPROVED'
-  | 'DELIVERED';
+  | 'CANCELLED'
+  | 'ON_HOLD'
+  | 'SKU_UNPROCESSED'
+  | 'PROCESSED_OUTSIDE_OF_SKUBANA'
+  | 'FBA_INBOUND_SHIPMENT_PLAN';
 
 export type CancelReasonType =
   | 'NO_INVENTORY'
@@ -127,8 +121,8 @@ export interface Customer {
   customerId: number;
 }
 export interface FulfillmentSource {
-  warehouseId: number;
-  name: string;
+  warehouseId?: number;
+  name?: string;
 }
 export interface LabelsEntity {
   labelId: number;
@@ -209,10 +203,10 @@ export interface SalesChannel {
   connectionParams?: null;
 }
 export interface ShipMethod {
-  shippingProviderId: number;
+  shippingProviderId?: number;
   shippingCarrier?: string;
   shippingServiceId?: number;
-  packageTypeId: number;
+  packageTypeId?: number;
   ltlFtlShipment?: null;
 }
 
@@ -235,4 +229,113 @@ export interface SkubanaExternalShipmentPayload {
   notifyCustomer: boolean;
   updateChannel: boolean;
   shipments: SkubanaExternalShipment;
+}
+
+export interface GetOrdersParams {
+  createdDateFrom: string;
+  modifiedDateFrom: string;
+  orderDateFrom: string;
+  orderId: number[];
+  orderNumber: string[];
+  limit: number;
+  page: number;
+  status: OrderStatus;
+  warehouseId: number;
+}
+
+export interface UpdateOrderParams {
+  customField1?: string;
+  customField2?: string;
+  customField3?: string;
+  fulfillmentSource?: FulfillmentSource;
+  height?: number;
+  internalNotes?: string;
+  length?: number;
+  orderIdentifier?: OrderIdentifier;
+  paymentDate?: Date;
+  receiveByDate?: Date;
+  shipAddress1?: string;
+  shipAddress2?: string;
+  shipAddress3?: string;
+  shipByDate?: Date;
+  shipCity?: string;
+  shipCompany?: string;
+  shipCountry?: string;
+  shipMethod?: ShipMethod;
+  shipName?: string;
+  shipPhone?: string;
+  shipState?: string;
+  shipZipCode?: string;
+  weight?: number;
+  width?: number;
+}
+
+export interface FulfillmentSource {
+  name?: string;
+  warehouseId?: number;
+}
+
+export interface OrderIdentifier {
+  orderId?: number;
+  orderNumber?: string;
+  salesChannelId?: number;
+}
+
+export interface ShipMethod {
+  packageTypeId?: number;
+  shippingCarrier?: string;
+  shippingProviderId?: number;
+  shippingServiceId?: number;
+}
+
+export interface LTLFtlShipment {
+  boxCount?: number;
+  contact?: Contact;
+  freightReadyDate?: Date;
+  id?: number;
+  liabilityCoverage?: number;
+  liabilityType?: string;
+  measurementUnitId?: number;
+  pallets?: Pallet[];
+  roleType?: string;
+  sellerDeclaredValue?: number;
+  sellerFreightClass?: string;
+  specialService?: string;
+  totalWeight?: number;
+}
+
+export interface Contact {
+  email?: string;
+  fax?: string;
+  id?: number;
+  name?: string;
+  phone?: string;
+}
+
+export interface Pallet {
+  height?: number;
+  id?: number;
+  length?: number;
+  packages?: Package[];
+  packagingType?: string;
+  stacked?: boolean;
+  weight?: number;
+  width?: number;
+}
+
+export interface Package {
+  height?: number;
+  id?: number;
+  insuredValue?: InsuredValue;
+  length?: number;
+  packagingTypeId?: number;
+  weight?: number;
+  weightUnitOfMeasure?: string;
+  width?: number;
+}
+
+export interface InsuredValue {
+  amount?: number;
+  currency?: string;
+  roundingMode?: string;
 }

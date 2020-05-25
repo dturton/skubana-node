@@ -28,8 +28,8 @@ export default class SkubanaApi {
     return order;
   }
 
-  public async cancelOrder(canelRequest: Types.CancelOrderRequest): Promise<any> {
-    const stringified = queryString.stringify(canelRequest);
+  public async cancelOrder(cancelRequest: Types.CancelOrderRequest): Promise<any> {
+    const stringified = queryString.stringify(cancelRequest);
     const response: AxiosResponse = await this.api.post(`/v1/orders/cancel?${stringified}`);
     const order: Types.Order = response.data;
     return order;
@@ -41,6 +41,20 @@ export default class SkubanaApi {
     );
     const orders = response.data;
     return orders;
+  }
+
+  public async getOrders(params: Types.GetOrdersParams): Promise<Types.Order[]> {
+    const stringified = queryString.stringify(params);
+    const response: AxiosResponse = await this.api.get(`/v1/orders?${stringified}`);
+    const orders = response.data;
+    return orders;
+  }
+
+  public async updateOrder(updateRequest: Types.UpdateOrderParams[]): Promise<any> {
+    const stringified = queryString.stringify(updateRequest);
+    const response: AxiosResponse = await this.api.post(`/v1/orders?${stringified}`);
+    const order: Types.Order = response.data;
+    return order;
   }
 
   public async createShipment(shipmentPayload: Types.SkubanaExternalShipmentPayload) {
