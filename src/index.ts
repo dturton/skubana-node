@@ -51,8 +51,7 @@ export default class SkubanaApi {
   }
 
   public async updateOrder(updateRequest: Types.UpdateOrderParams[]): Promise<any> {
-    const stringified = queryString.stringify(updateRequest);
-    const response: AxiosResponse = await this.api.post(`/v1/orders?${stringified}`);
+    const response: AxiosResponse = await this.api.post(`/v1/orders`, updateRequest);
     const order: Types.Order = response.data;
     return order;
   }

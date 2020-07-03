@@ -232,15 +232,15 @@ export interface SkubanaExternalShipmentPayload {
 }
 
 export interface GetOrdersParams {
-  createdDateFrom: string;
-  modifiedDateFrom: string;
-  orderDateFrom: string;
-  orderId: number[];
-  orderNumber: string[];
-  limit: number;
-  page: number;
-  status: OrderStatus;
-  warehouseId: number;
+  createdDateFrom?: string;
+  modifiedDateFrom?: string;
+  orderDateFrom?: string;
+  orderId?: number[];
+  orderNumber?: string[];
+  limit?: number;
+  page?: number;
+  status?: OrderStatus;
+  warehouseId?: number;
 }
 
 export interface UpdateOrderParams {

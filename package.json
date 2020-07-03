@@ -1,6 +1,6 @@
 {
   "name": "skubana-node",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Node.js wrapper for http://www.skubana.com/ REST API.",
   "repository": {
     "type": "git",
