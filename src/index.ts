@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import rateLimit from 'axios-rate-limit';
 import queryString from 'query-string';
+
 import * as Types from './types';
 
 export default class SkubanaApi {
@@ -12,7 +14,7 @@ export default class SkubanaApi {
       headers: { Authorization: `Bearer ${token}` },
     };
 
-    this.api = axios.create(this.config);
+    this.api = rateLimit(axios.create(this.config), { maxRequests: 3, perMilliseconds: 1000 });
 
     this.api.interceptors.response.use(
       (response: AxiosResponse) => response,
