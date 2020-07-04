@@ -1,12 +1,15 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import rateLimit from 'axios-rate-limit';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import queryString from 'query-string';
 
 import * as Types from './types';
 
 export default class SkubanaApi {
   private api: AxiosInstance;
+  private pendingRequests: number;
   private config: AxiosRequestConfig;
+
+  public maxRequestsCount: number;
+  public intervalMs: number;
 
   public constructor(token: string, config?: AxiosRequestConfig) {
     this.config = {
@@ -14,11 +17,37 @@ export default class SkubanaApi {
       headers: { Authorization: `Bearer ${token}` },
     };
 
-    this.api = rateLimit(axios.create(this.config), { maxRequests: 3, perMilliseconds: 1000 });
+    this.pendingRequests = 0;
+    this.maxRequestsCount = 4;
+    this.intervalMs = 1000;
+    this.api = axios.create(this.config);
+
+    /**
+     * Axios Request Interceptor
+     */
+    this.api.interceptors.request.use(configInfo => {
+      return new Promise((resolve, reject) => {
+        const interval = setInterval(() => {
+          if (this.pendingRequests < this.maxRequestsCount) {
+            this.pendingRequests++;
+            clearInterval(interval);
+            resolve(configInfo);
+          }
+        }, this.intervalMs);
+      });
+    });
 
     this.api.interceptors.response.use(
-      (response: AxiosResponse) => response,
-      (error: any) => {
+      (response: AxiosResponse) => {
+        this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+        console.log(response.status);
+        return Promise.resolve(response);
+      },
+      (error: AxiosError) => {
+        this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+        if (error.response) {
+          console.log(error.response.status);
+        }
         return Promise.reject(error);
       },
     );
@@ -47,7 +76,7 @@ export default class SkubanaApi {
 
   public async getOrders(params: Types.GetOrdersParams): Promise<Types.Order[]> {
     const stringified = queryString.stringify(params);
-    const response: AxiosResponse = await this.api.get(`/v1/orders?${stringified}`);
+    const response: AxiosResponse = await this.api.get(`/v1.1/orders?${stringified}`);
     const orders = response.data;
     return orders;
   }

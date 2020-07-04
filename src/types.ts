@@ -339,3 +339,8 @@ export interface InsuredValue {
   currency?: string;
   roundingMode?: string;
 }
+
+export interface RateLimits {
+  MAX_REQUESTS_COUNT: number;
+  INTERVAL_MS: number;
+}
