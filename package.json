@@ -1,6 +1,6 @@
 {
   "name": "skubana-node",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Node.js wrapper for http://www.skubana.com/ REST API.",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "axios-rate-limit": "^1.2.1",
-    "query-string": "^6.12.1"
+    "query-string": "^6.12.1",
+    "retry-axios": "^2.2.1"
   }
 }
