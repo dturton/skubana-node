@@ -1,7 +1,9 @@
+import * as rax from 'retry-axios';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import queryString from 'query-string';
 
 import * as Types from './types';
+import { setInterval } from 'timers';
 
 export default class SkubanaApi {
   private api: AxiosInstance;
@@ -18,9 +20,21 @@ export default class SkubanaApi {
     };
 
     this.pendingRequests = 0;
-    this.maxRequestsCount = 4;
-    this.intervalMs = 1000;
+    this.maxRequestsCount = 2;
+    this.intervalMs = 2000;
     this.api = axios.create(this.config);
+
+    this.api.defaults.raxConfig = {
+      instance: this.api,
+      retryDelay: 1000,
+      onRetryAttempt: err => {
+        const cfg = rax.getConfig(err);
+        // tslint:disable-next-line: no-console
+        if (cfg) console.log(`Retry attempt #${cfg.currentRetryAttempt}`);
+      },
+    };
+
+    const interceptorId = rax.attach(this.api);
 
     /**
      * Axios Request Interceptor
@@ -40,6 +54,7 @@ export default class SkubanaApi {
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
         this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+
         return Promise.resolve(response);
       },
       (error: AxiosError) => {
