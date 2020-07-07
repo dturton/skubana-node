@@ -1,4 +1,3 @@
-import * as rax from 'retry-axios';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import queryString from 'query-string';
 
@@ -7,58 +6,21 @@ import { setInterval } from 'timers';
 
 export default class SkubanaApi {
   private api: AxiosInstance;
-  private pendingRequests: number;
+
   private config: AxiosRequestConfig;
-
-  public maxRequestsCount: number;
-  public intervalMs: number;
-
   public constructor(token: string, config?: AxiosRequestConfig) {
     this.config = {
       baseURL: 'https://api.skubana.com',
       headers: { Authorization: `Bearer ${token}` },
     };
 
-    this.pendingRequests = 0;
-    this.maxRequestsCount = 2;
-    this.intervalMs = 2000;
     this.api = axios.create(this.config);
-
-    this.api.defaults.raxConfig = {
-      instance: this.api,
-      retryDelay: 1000,
-      onRetryAttempt: err => {
-        const cfg = rax.getConfig(err);
-        // tslint:disable-next-line: no-console
-        if (cfg) console.log(`Retry attempt #${cfg.currentRetryAttempt}`);
-      },
-    };
-
-    const interceptorId = rax.attach(this.api);
-
-    /**
-     * Axios Request Interceptor
-     */
-    this.api.interceptors.request.use(configInfo => {
-      return new Promise((resolve, reject) => {
-        const interval = setInterval(() => {
-          if (this.pendingRequests < this.maxRequestsCount) {
-            this.pendingRequests++;
-            clearInterval(interval);
-            resolve(configInfo);
-          }
-        }, this.intervalMs);
-      });
-    });
 
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
-        this.pendingRequests = Math.max(0, this.pendingRequests - 1);
-
         return Promise.resolve(response);
       },
       (error: AxiosError) => {
-        this.pendingRequests = Math.max(0, this.pendingRequests - 1);
         return Promise.reject(error);
       },
     );
