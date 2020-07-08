@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import queryString from 'query-string';
+import axiosRetry, { isNetworkOrIdempotentRequestError } from 'axios-retry';
 
 import * as Types from './types';
-import { setInterval } from 'timers';
 
 export default class SkubanaApi {
   private api: AxiosInstance;
@@ -15,6 +15,15 @@ export default class SkubanaApi {
     };
 
     this.api = axios.create(this.config);
+    axiosRetry(this.api, {
+      retries: 3,
+      retryCondition: (error: AxiosError) => {
+        return isNetworkOrIdempotentRequestError(error) || error.response.status === 429;
+      },
+      retryDelay: retryCount => {
+        return retryCount * 1000;
+      },
+    });
 
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
