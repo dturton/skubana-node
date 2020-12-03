@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import queryString from 'query-string';
-
+import { GetOrdersParams } from './types';
 import * as Types from './types';
 
 export default class SkubanaApi {
@@ -14,7 +14,6 @@ export default class SkubanaApi {
     };
 
     this.api = axios.create(this.config);
-
 
     this.api.interceptors.response.use(
       (response: AxiosResponse) => {
@@ -32,23 +31,21 @@ export default class SkubanaApi {
     return order;
   }
 
-  public async cancelOrder(cancelRequest: Types.CancelOrderRequest): Promise<any> {
+  public async getOrderbyId(orderId: number): Promise<Types.Order> {
+    const response: AxiosResponse = await this.api.get(`/v1.1/orders/${orderId}`);
+    const order: Types.Order = response.data;
+    return order;
+  }
+
+  public async cancelOrder(cancelRequest: any): Promise<any> {
     const stringified = queryString.stringify(cancelRequest);
     const response: AxiosResponse = await this.api.post(`/v1/orders/cancel?${stringified}`);
     const order: Types.Order = response.data;
     return order;
   }
 
-  public async getOrdersByWarehouse(warehouseId: number, limit: number): Promise<Types.Order[]> {
-    const response: AxiosResponse = await this.api.get(
-      `/v1.1/orders?status=AWAITING_SHIPMENT&warehouseId=${warehouseId}&limit=${limit}`,
-    );
-    const orders = response.data;
-    return orders;
-  }
-
-  public async getOrders(params: Types.GetOrdersParams): Promise<Types.Order[]> {
-    const stringified = queryString.stringify(params);
+  public async getOrders(params: GetOrdersParams): Promise<Types.Order[]> {
+    const stringified = queryString.stringify({ ...params });
     const response: AxiosResponse = await this.api.get(`/v1.1/orders?${stringified}`);
     const orders = response.data;
     return orders;
